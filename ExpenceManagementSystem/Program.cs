@@ -1,12 +1,8 @@
 using Application.Interface;
 using Application.Services;
-using Domain.Entities;
+using Domain.Entities.JWT;
 using ExpenceManagementSystemAPI.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;  
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using Presistence.DbContext;
 using Presistence.Repository;
 using System;
@@ -29,6 +25,7 @@ public class Program
         #region Dependency Injection
         builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
         #endregion
 
         // Configure Identity and JWT Authentication
@@ -48,6 +45,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();

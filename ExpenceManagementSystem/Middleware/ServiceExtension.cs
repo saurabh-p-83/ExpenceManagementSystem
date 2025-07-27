@@ -14,7 +14,7 @@ namespace ExpenceManagementSystemAPI.Middleware
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
                     .AddEntityFrameworkStores<AppDbContext>()
                     .AddDefaultTokenProviders();
-
+          var key = (config["Jwt:SecretKey"]);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -12,5 +12,6 @@ namespace Domain.Entities.ApplicationUsers
         public string FullName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string Address { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

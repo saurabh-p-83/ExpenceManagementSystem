@@ -1,5 +1,6 @@
 ﻿using Application.Interface;
 using Domain.Entities.Invoice;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenceManagementSystemAPI.Controllers
@@ -14,7 +15,7 @@ namespace ExpenceManagementSystemAPI.Controllers
         {
             _invoiceService = invoiceService;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromBody] GetInvoiceDtoReq dto)
         {
