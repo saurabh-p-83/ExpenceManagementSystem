@@ -1,4 +1,4 @@
-﻿using Application.Interface;
+﻿using Application.Interface.Invoice;
 using Domain.Entities.Invoice;
 using Domain.Enums;
 
