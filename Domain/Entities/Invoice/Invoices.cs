@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Invoice
 {
-    public class Invoice
+    public class Invoices
     {
         public Guid Id { get; set; }
         public string Vendor { get; set; } = string.Empty;

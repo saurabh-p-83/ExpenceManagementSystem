@@ -21,7 +21,7 @@ namespace Infrastructure.Services
         /// <summary>
         /// Extracts invoice data from a file stream
         /// </summary>
-        public async Task<Invoice> ExtractInvoiceDataAsync(Stream fileStream, string fileName)
+        public async Task<Invoices> ExtractInvoiceDataAsync(Stream fileStream, string fileName)
         {
             var operation = await _client.AnalyzeDocumentAsync(
                 WaitUntil.Completed,
@@ -33,7 +33,7 @@ namespace Infrastructure.Services
         /// <summary>
         /// Extracts invoice data from a file already uploaded to Blob Storage.
         /// </summary>
-        public async Task<Invoice> ExtractInvoiceDataFromBlobAsync(string fileUrl)
+        public async Task<Invoices> ExtractInvoiceDataFromBlobAsync(string fileUrl)
         {
             var operation = await _client.AnalyzeDocumentAsync(
                 WaitUntil.Completed,
@@ -43,7 +43,7 @@ namespace Infrastructure.Services
             return MapToInvoice(operation.Value, fileUrl);
         }
 
-        private Invoice MapToInvoice(AnalyzeResult result, string fileReference)
+        private Invoices MapToInvoice(AnalyzeResult result, string fileReference)
         {
             var doc = result.Documents.FirstOrDefault();
             if (doc == null)
@@ -73,7 +73,7 @@ namespace Infrastructure.Services
                     date = parsed;
             }
 
-            return new Invoice
+            return new Invoices
             {
                 Id = Guid.NewGuid(),
                 Vendor = vendor,

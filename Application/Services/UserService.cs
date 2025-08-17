@@ -32,5 +32,5 @@ namespace Application.Services
             return user;
         }
     }
-    }
 }
+

@@ -10,6 +10,7 @@ using Infrastructure.Options;
 using System;
 using System.Text;
 using Infrastructure.Services;
+using Application.Interface;
 
 public class Program
 {

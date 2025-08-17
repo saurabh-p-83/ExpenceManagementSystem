@@ -1,4 +1,5 @@
-﻿using Application.Interface.Invoice;
+﻿using Application.Interface;
+using Application.Interface.Invoice;
 using Domain.Entities.Invoice;
 using Domain.Enums;
 
@@ -23,7 +24,7 @@ namespace Application.Services
                 .Select(id => Guid.Parse(id.Trim()))
                 .ToList();
 
-            var allInvoices = new List<Invoice>();
+            var allInvoices = new List<Invoices>();
 
             foreach (var userId in userIds)
             {
@@ -48,7 +49,7 @@ namespace Application.Services
 
             var category = CategorizeInvoice(dto);
 
-            var invoice = new Invoice
+            var invoice = new Invoices
             {
                 Id = Guid.NewGuid(),
                 Vendor = dto.Vendor,

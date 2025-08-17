@@ -18,19 +18,19 @@ namespace Presistence.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Invoice>> GetInvoicesAsync(Guid userId)
+        public async Task<IEnumerable<Invoices>> GetInvoicesAsync(Guid userId)
         {
             return await _context.Invoices
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
         }
 
-        public async Task<Invoice> GetByIdAsync(Guid id)
+        public async Task<Invoices> GetByIdAsync(Guid id)
         {
             return await _context.Invoices.FindAsync(id);
         }
 
-        public async Task<Guid> AddInvoiceAsync(Invoice invoice)
+        public async Task<Guid> AddInvoiceAsync(Invoices invoice)
         {
             _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();
