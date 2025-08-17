@@ -1,5 +1,5 @@
 ﻿using Application.Interface.Invoice;
-using Domain.Entities.Invoice;
+using Application.DTOs.Invoices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

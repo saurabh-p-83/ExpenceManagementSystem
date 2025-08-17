@@ -5,7 +5,6 @@ using Presistence.DbContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Presistence.Repository
@@ -13,6 +12,7 @@ namespace Presistence.Repository
     public class InvoiceRepository : IInvoiceRepository
     {
         private readonly AppDbContext _context;
+
         public InvoiceRepository(AppDbContext context)
         {
             _context = context;
@@ -25,18 +25,25 @@ namespace Presistence.Repository
                 .ToListAsync();
         }
 
-        public async Task<Invoices> GetByIdAsync(Guid id)
+        public async Task<Invoices?> GetByIdAsync(Guid id)
         {
-            return await _context.Invoices.FindAsync(id);
+            return await _context.Invoices
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Guid> AddInvoiceAsync(Invoices invoice)
+        public async Task AddInvoiceAsync(Invoices invoice)
         {
-            _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
-            return invoice.Id;
+            await _context.Invoices.AddAsync(invoice);
         }
 
-        public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
+        public void UpdateInvoice(Invoices invoice)
+        {
+            _context.Invoices.Update(invoice);
+        }
+
+        public void DeleteInvoice(Invoices invoice)
+        {
+            _context.Invoices.Remove(invoice);
+        }
     }
 }

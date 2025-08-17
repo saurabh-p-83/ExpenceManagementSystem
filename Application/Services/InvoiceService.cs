@@ -1,6 +1,8 @@
-﻿using Application.Interface;
+﻿using Application.DTOs;
+using Application.Interface;
 using Application.Interface.Invoice;
 using Domain.Entities.Invoice;
+using Application.DTOs.Invoices;
 using Domain.Enums;
 
 
@@ -19,14 +21,9 @@ namespace Application.Services
 
         public async Task<IEnumerable<GetInvoiceDtoRes>> GetInvoiceAsync(GetInvoiceDtoReq input)
         {
-            var userIds = input.userId
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(id => Guid.Parse(id.Trim()))
-                .ToList();
-
             var allInvoices = new List<Invoices>();
 
-            foreach (var userId in userIds)
+            foreach (var userId in input.UserIds)
             {
                 var invoices = await _invoiceRepository.GetInvoicesAsync(userId);
                 allInvoices.AddRange(invoices);
@@ -38,9 +35,10 @@ namespace Application.Services
                 Vendor = i.Vendor,
                 Amount = i.Amount,
                 Date = i.Date,
-                Category = i.Category.ToString(),
+                Category = i.Category.ToString(), 
                 Description = i.Description,
-                UserId = i.UserId
+                UserId = i.UserId,
+                FileUrl = i.FileUrl
             });
         }
         public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto)

@@ -10,8 +10,10 @@ namespace Application.Interface.Invoice
     public interface IInvoiceRepository
     {
         Task<IEnumerable<Invoices>> GetInvoicesAsync(Guid userId);
-        Task<Invoices> GetByIdAsync(Guid id);
-        Task<Guid> AddInvoiceAsync(Invoices invoice);
-        Task SaveChangesAsync();
+        Task<Invoices?> GetByIdAsync(Guid id);
+        Task AddInvoiceAsync(Invoices invoice);
+        void UpdateInvoice(Invoices invoice);
+        void DeleteInvoice(Invoices invoice);
     }
 }
+

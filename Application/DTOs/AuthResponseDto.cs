@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.AI
+namespace Application.DTOs
 {
-    internal class OCRService
+    internal class AuthResponseDto
     {
     }
 }
