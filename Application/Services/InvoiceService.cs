@@ -37,11 +37,19 @@ namespace Application.Services
         }
         public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto)
         {
-            var fileUrl = await _fileStorageService.UploadFileOnBlob(dto.BillFile);
+            string? fileUrl = null;
+            if (dto.BillFile != null)
+            {
+                fileUrl = await _fileStorageService.UploadFileOnBlob(dto.BillFile);
+            }
+
 
             var category = CategorizeInvoice(dto);
 
             var invoice = _mapper.Map<Invoices>(dto);
+            ;
+            invoice.FileUrl = fileUrl;
+            invoice.Category = category;
 
             await _invoiceRepository.AddInvoiceAsync(invoice);
 
