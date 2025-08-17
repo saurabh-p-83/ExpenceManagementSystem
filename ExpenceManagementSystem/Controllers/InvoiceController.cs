@@ -1,4 +1,4 @@
-﻿using Application.Interface;
+﻿using Application.Interface.Invoice;
 using Domain.Entities.Invoice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
