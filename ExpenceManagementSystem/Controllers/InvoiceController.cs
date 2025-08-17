@@ -3,7 +3,7 @@ using Application.DTOs.Invoices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExpenceManagementSystemAPI.Controllers
+namespace ExpenseManagementSystemAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

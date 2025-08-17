@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Application.Interface.User;
 using Domain.Entities.ApplicationUsers;
 using Microsoft.EntityFrameworkCore;
-using Presistence.DbContext;
+using Persistence.DbContext;
 
 namespace Persistence.Repository
 {

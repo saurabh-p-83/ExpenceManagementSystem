@@ -5,12 +5,12 @@ using Application.Mapping;
 using Application.Services;
 using Application.Validators.Invoices;
 using Domain.Entities.JWT;
-using ExpenceManagementSystemAPI.Middleware;
+using ExpenseManagementSystemAPI.Middleware;
 using Infrastructure.Options;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Presistence.DbContext;
-using Presistence.Repository;
+using Persistence.DbContext;
+using Persistence.Repository;
 using System;
 using System.Text;
 

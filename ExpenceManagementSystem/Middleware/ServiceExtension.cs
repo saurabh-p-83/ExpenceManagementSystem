@@ -6,10 +6,10 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Presistence.DbContext;
+using Persistence.DbContext;
 using System.Text;
 
-namespace ExpenceManagementSystemAPI.Middleware
+namespace ExpenseManagementSystemAPI.Middleware
 {
     public static class ServiceExtension
     {

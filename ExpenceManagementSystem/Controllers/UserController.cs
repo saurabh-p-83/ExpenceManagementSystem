@@ -3,7 +3,7 @@ using Domain.Entities.Invoice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ExpenceManagementSystemAPI.Controllers
+namespace ExpenseManagementSystemAPI.Controllers
 {
     public class UserController : Controller
     {

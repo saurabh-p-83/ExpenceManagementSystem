@@ -1,13 +1,13 @@
 ﻿using Application.Interface.Invoice;
 using Domain.Entities.Invoice;
 using Microsoft.EntityFrameworkCore;
-using Presistence.DbContext;
+using Persistence.DbContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Presistence.Repository
+namespace Persistence.Repository
 {
     public class InvoiceRepository : IInvoiceRepository
     {

@@ -8,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace ExpenceManagementSystemAPI.Controllers
+namespace ExpenseManagementSystemAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
