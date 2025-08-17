@@ -1,8 +1,9 @@
 ﻿using Application.DTOs;
+using Application.DTOs.Invoices;
 using Application.Interface;
 using Application.Interface.Invoice;
+using AutoMapper;
 using Domain.Entities.Invoice;
-using Application.DTOs.Invoices;
 using Domain.Enums;
 
 
@@ -12,11 +13,14 @@ namespace Application.Services
     {
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IMapper _mapper;
 
-        public InvoiceService(IInvoiceRepository invoiceRepository, IFileStorageService fileStorageService)
+
+        public InvoiceService(IInvoiceRepository invoiceRepository, IFileStorageService fileStorageService, IMapper mapper)
         {
             _invoiceRepository = invoiceRepository;
             _fileStorageService = fileStorageService;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<GetInvoiceDtoRes>> GetInvoiceAsync(GetInvoiceDtoReq input)
@@ -29,17 +33,7 @@ namespace Application.Services
                 allInvoices.AddRange(invoices);
             }
 
-            return allInvoices.Select(i => new GetInvoiceDtoRes
-            {
-                Id = i.Id,
-                Vendor = i.Vendor,
-                Amount = i.Amount,
-                Date = i.Date,
-                Category = i.Category.ToString(), 
-                Description = i.Description,
-                UserId = i.UserId,
-                FileUrl = i.FileUrl
-            });
+            return _mapper.Map<IEnumerable<GetInvoiceDtoRes>>(allInvoices);
         }
         public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto)
         {
@@ -47,17 +41,7 @@ namespace Application.Services
 
             var category = CategorizeInvoice(dto);
 
-            var invoice = new Invoices
-            {
-                Id = Guid.NewGuid(),
-                Vendor = dto.Vendor,
-                Amount = dto.Amount,
-                Date = dto.Date,
-                Category = category,
-                Description = dto.Description,
-                UserId = dto.UserId,  
-                FileUrl = fileUrl
-            };
+            var invoice = _mapper.Map<Invoices>(dto);
 
             await _invoiceRepository.AddInvoiceAsync(invoice);
 

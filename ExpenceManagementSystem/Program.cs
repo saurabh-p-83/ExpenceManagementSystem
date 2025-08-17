@@ -1,16 +1,18 @@
+using Application.Interface;
 using Application.Interface.Auth;
 using Application.Interface.Invoice;
+using Application.Mapping;
 using Application.Services;
+using Application.Validators.Invoices;
 using Domain.Entities.JWT;
 using ExpenceManagementSystemAPI.Middleware;
+using Infrastructure.Options;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Presistence.DbContext;
 using Presistence.Repository;
-using Infrastructure.Options;
 using System;
 using System.Text;
-using Infrastructure.Services;
-using Application.Interface;
 
 public class Program
 {
@@ -26,6 +28,7 @@ public class Program
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
         builder.Services.Configure<AzureBlobSettings>(builder.Configuration.GetSection("AzureBlobSettings"));
         builder.Services.Configure<AzureDocumentIntelligenceSettings>(builder.Configuration.GetSection("AzureDocumentIntelligenceSettings"));
+
 
 
         #region Dependency Injection
