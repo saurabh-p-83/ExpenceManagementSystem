@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Application.Interface
 {
-    public interface IInvoiceService
+    public interface IOcrInvoiceService
     {
-        Task<IEnumerable<GetInvoiceDtoRes>> GetInvoiceAsync(GetInvoiceDtoReq input);
-        Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto);
+        Task<Invoice> ExtractInvoiceDataAsync(Stream fileStream, string fileName);
+        Task<Invoice> ExtractInvoiceDataFromBlobAsync(string fileUrl);
     }
 }

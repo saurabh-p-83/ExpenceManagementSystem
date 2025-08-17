@@ -13,23 +13,24 @@ namespace Presistence.Repository
     public class InvoiceRepository : IInvoiceRepository
     {
         private readonly AppDbContext _context;
-
         public InvoiceRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<InvoiceDto>> GetInvoicesAsync(Guid userId)
+        public async Task<IEnumerable<Invoice>> GetInvoicesAsync(Guid userId)
         {
-            return await _context.Invoices.Where(x => x.UserId == userId).ToListAsync();
+            return await _context.Invoices
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
         }
 
-        public async Task<InvoiceDto> GetByIdAsync(Guid id)
+        public async Task<Invoice> GetByIdAsync(Guid id)
         {
             return await _context.Invoices.FindAsync(id);
         }
 
-        public async Task<Guid> AddInvoiceAsync(InvoiceDto invoice)
+        public async Task<Guid> AddInvoiceAsync(Invoice invoice)
         {
             _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();

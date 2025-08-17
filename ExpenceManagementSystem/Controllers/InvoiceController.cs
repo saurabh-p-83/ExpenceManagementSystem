@@ -16,7 +16,7 @@ namespace ExpenceManagementSystemAPI.Controllers
             _invoiceService = invoiceService;
         }
         [Authorize]
-        [HttpGet]
+        [HttpPost("GetAllInvoices")]
         public async Task<IActionResult> GetAllInvoices([FromBody] GetInvoiceDtoReq dto)
         {
             var invoices = await _invoiceService.GetInvoiceAsync(dto);
@@ -24,10 +24,9 @@ namespace ExpenceManagementSystemAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostInvoice([FromBody] PostInvoiceDto dto)
+        public async Task<IActionResult> PostInvoice([FromForm] PostInvoiceDto dto)
         {
-            var userId = Guid.NewGuid();
-            var id = await _invoiceService.SaveInvoiceAsync(dto, userId);
+            var id = await _invoiceService.SaveInvoiceAsync(dto);
             return Ok(new { id });
         }
     }

@@ -16,6 +16,6 @@ namespace Presistence.DbContext
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         //Add here to genrate table according to need 
-        public DbSet<InvoiceDto> Invoices { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
     }
 }

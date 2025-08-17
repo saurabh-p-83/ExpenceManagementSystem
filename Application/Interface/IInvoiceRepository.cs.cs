@@ -9,9 +9,9 @@ namespace Application.Interface
 {
     public interface IInvoiceRepository
     {
-        Task<IEnumerable<InvoiceDto>> GetInvoicesAsync(Guid userId);
-        Task<InvoiceDto> GetByIdAsync(Guid id);
-        Task<Guid> AddInvoiceAsync(InvoiceDto invoice);
+        Task<IEnumerable<Invoice>> GetInvoicesAsync(Guid userId);
+        Task<Invoice> GetByIdAsync(Guid id);
+        Task<Guid> AddInvoiceAsync(Invoice invoice);
         Task SaveChangesAsync();
     }
 }

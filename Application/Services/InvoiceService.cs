@@ -8,10 +8,12 @@ namespace Application.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly IInvoiceRepository _invoiceRepository;
+        private readonly IFileStorageService _fileStorageService;
 
-        public InvoiceService(IInvoiceRepository invoiceRepository)
+        public InvoiceService(IInvoiceRepository invoiceRepository, IFileStorageService fileStorageService)
         {
             _invoiceRepository = invoiceRepository;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<IEnumerable<GetInvoiceDtoRes>> GetInvoiceAsync(GetInvoiceDtoReq input)
@@ -21,7 +23,7 @@ namespace Application.Services
                 .Select(id => Guid.Parse(id.Trim()))
                 .ToList();
 
-            var allInvoices = new List<InvoiceDto>();
+            var allInvoices = new List<Invoice>();
 
             foreach (var userId in userIds)
             {
@@ -40,20 +42,38 @@ namespace Application.Services
                 UserId = i.UserId
             });
         }
-
-        public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto, Guid userId)
+        public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto)
         {
-            var invoice = new PostInvoiceDto
+            var fileUrl = await _fileStorageService.UploadFileOnBlob(dto.BillFile);
+
+            var category = CategorizeInvoice(dto);
+
+            var invoice = new Invoice
             {
                 Id = Guid.NewGuid(),
                 Vendor = dto.Vendor,
                 Amount = dto.Amount,
                 Date = dto.Date,
-                Category = dto.Category,
-                UserId = userId
+                Category = category,
+                Description = dto.Description,
+                UserId = dto.UserId,  
+                FileUrl = fileUrl
             };
 
-            return await _invoiceRepository.AddInvoiceAsync(invoice);
+            await _invoiceRepository.AddInvoiceAsync(invoice);
+
+            return invoice.Id;
+        }
+        private InvoiceCategory CategorizeInvoice(PostInvoiceDto dto)
+        {
+            //Basic AI logic placeholder — replace with ML later
+            if (dto.Vendor.Contains("Amazon", StringComparison.OrdinalIgnoreCase))
+                return InvoiceCategory.Shopping;
+
+            if (dto.Vendor.Contains("Uber", StringComparison.OrdinalIgnoreCase))
+                return InvoiceCategory.Travel;
+
+            return InvoiceCategory.Other;
         }
     }
 }
