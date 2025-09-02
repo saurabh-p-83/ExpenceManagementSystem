@@ -18,4 +18,5 @@ namespace Persistence.DbContext
         //Add here to genrate table according to need 
         public DbSet<Invoices> Invoices { get; set; }
     }
+
 }

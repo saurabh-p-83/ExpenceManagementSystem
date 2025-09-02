@@ -4,6 +4,7 @@ using Application.Interface.Invoice;
 using Application.Mapping;
 using Application.Services;
 using Application.Validators.Invoices;
+using Azure.Identity;
 using Domain.Entities.JWT;
 using ExpenseManagementSystemAPI.Middleware;
 using Infrastructure.Options;
@@ -20,14 +21,27 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Load Azure Key Vault 
+        var keyVaultName = builder.Configuration["KeyVaultName"] ?? "expensemgmt-dev-kv";
+        var keyVaultUri = new Uri($"https://expensemgmt-dev-keyvault.vault.azure.net/");
+        builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-        builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+        {
+            var sqlConn = builder.Configuration["AzureSql--ConnectionString"];
+            options.UseSqlServer(sqlConn);
+        });
+        builder.Services.Configure<AzureDocumentIntelligenceSettings>(options =>
+        {
+            options.Endpoint = builder.Configuration["Ocr-Endpoint"];
+            options.ApiKey = builder.Configuration["Ocr-ApiKey"];
+        });
         builder.Services.Configure<AzureBlobSettings>(builder.Configuration.GetSection("AzureBlobSettings"));
-        builder.Services.Configure<AzureDocumentIntelligenceSettings>(builder.Configuration.GetSection("AzureDocumentIntelligenceSettings"));
+        builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 
 
@@ -41,9 +55,10 @@ public class Program
 
         // Configure Identity and JWT Authentication
         builder.Services.AddIdentityAndJwtAuthentication(builder.Configuration);
-
+        builder.Services.AddApplicationServices();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
 
         var app = builder.Build();
 

@@ -14,8 +14,10 @@ namespace Infrastructure.Services
 
         public OcrInvoiceService(IOptions<AzureDocumentIntelligenceSettings> settings)
         {
-            var credential = new AzureKeyCredential(settings.Value.ApiKey);
-            _client = new DocumentIntelligenceClient(new Uri(settings.Value.Endpoint), credential);
+            var config = settings.Value ?? throw new ArgumentNullException(nameof(settings));
+
+            var credential = new AzureKeyCredential(config.ApiKey);
+            _client = new DocumentIntelligenceClient(new Uri(config.Endpoint), credential);
         }
 
         /// <summary>
