@@ -43,7 +43,9 @@ public class Program
             options.Endpoint = builder.Configuration["Ocr-Endpoint"];
             options.ApiKey = builder.Configuration["Ocr-ApiKey"];
         });
-        builder.Services.Configure<AzureBlobSettings>(builder.Configuration.GetSection("AzureBlobSettings"));
+        builder.Services.Configure<AzureBlobSettings>(
+            builder.Configuration.GetSection("AzureBlobSettings")
+        );
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 
