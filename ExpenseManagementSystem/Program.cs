@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.DbContext;
 using Persistence.Repository;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 public class Program
@@ -21,9 +23,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Load Azure Key Vault 
-        var keyVaultName = builder.Configuration["KeyVaultName"] ?? "expensemgmt-dev-kv";
-        var keyVaultUri = new Uri($"https://expensemgmt-dev-keyvault.vault.azure.net/");
+        // Load Azure Key Vault
+        var keyVaultName = builder.Configuration["KeyVaultName"] ?? "expensemgmt-dev-keyvault";
+        var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
         builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
         builder.Services.AddControllers();
@@ -32,9 +34,10 @@ public class Program
 
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
-            var sqlConn = builder.Configuration["AzureSql--ConnectionString"];
+            var sqlConn = builder.Configuration["AzureSql:ConnectionString"];
             options.UseSqlServer(sqlConn);
         });
+
         builder.Services.Configure<AzureDocumentIntelligenceSettings>(options =>
         {
             options.Endpoint = builder.Configuration["Ocr-Endpoint"];
