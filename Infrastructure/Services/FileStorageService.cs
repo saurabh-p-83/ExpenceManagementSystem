@@ -1,12 +1,9 @@
-﻿using Application.Interface;
+﻿using Application.Interface.Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Infrastructure.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {

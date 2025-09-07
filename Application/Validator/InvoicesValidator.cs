@@ -1,24 +1,21 @@
 ﻿using Application.DTOs.Invoices;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Validators.Invoices
 {
     public class PostInvoiceDtoValidator : AbstractValidator<PostInvoiceDto>
     {
+        private readonly string[] _allowedContentTypes = new[] { "application/pdf", "image/png", "image/jpeg" };
+
         public PostInvoiceDtoValidator()
         {
-            RuleFor(x => x.Vendor)
-                .NotEmpty().WithMessage("Vendor is required")
-                .MaximumLength(100);
-
-            RuleFor(x => x.Amount)
-                .GreaterThan(0).WithMessage("Amount must be greater than 0");
-
-            RuleFor(x => x.Date)
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Date cannot be in the future");
-
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("UserId is required");
+            RuleFor(x => x.BillFile)
+                .NotNull().WithMessage("Receipt file is required.")
+                .Must(f => f != null && f.Length > 0).WithMessage("File is empty.")
+                .Must(f => f != null && f.Length <= 10 * 1024 * 1024).WithMessage("Maximum file size is 10 MB.")
+                .Must(f => f != null && _allowedContentTypes.Contains(f.ContentType))
+                .WithMessage("Only PDF, PNG and JPEG files are supported.");
         }
     }
     public class GetInvoiceDtoReqValidator : AbstractValidator<GetInvoiceDtoReq>

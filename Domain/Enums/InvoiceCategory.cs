@@ -14,6 +14,5 @@ namespace Domain.Enums
         Entertainment,
         Utilities,
         Other
-
     }
 }

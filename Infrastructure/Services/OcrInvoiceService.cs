@@ -1,4 +1,5 @@
-﻿using Application.Interface;
+﻿using Application.Interface.Azure;
+using Application.Interface.NewFolder;
 using Azure;
 using Azure.AI.DocumentIntelligence;
 using Domain.Entities.Invoice;
@@ -11,30 +12,29 @@ namespace Infrastructure.Services
     public class OcrInvoiceService : IOcrInvoiceService
     {
         private readonly DocumentIntelligenceClient _client;
+        private readonly ICategorizationService _categorizationService;
 
-        public OcrInvoiceService(IOptions<AzureDocumentIntelligenceSettings> settings)
+        public OcrInvoiceService(
+            IOptions<AzureDocumentIntelligenceSettings> settings,
+            ICategorizationService categorizationService)
         {
             var config = settings.Value ?? throw new ArgumentNullException(nameof(settings));
+            _categorizationService = categorizationService ?? throw new ArgumentNullException(nameof(categorizationService));
 
             var credential = new AzureKeyCredential(config.ApiKey);
             _client = new DocumentIntelligenceClient(new Uri(config.Endpoint), credential);
         }
 
-        /// <summary>
-        /// Extracts invoice data from a file stream
-        /// </summary>
         public async Task<Invoices> ExtractInvoiceDataAsync(Stream fileStream, string fileName)
         {
             var operation = await _client.AnalyzeDocumentAsync(
                 WaitUntil.Completed,
                 "prebuilt-invoice",
                 BinaryData.FromStream(fileStream));
-            return MapToInvoice(operation.Value, fileName);
+
+            return await MapToInvoiceAsync(operation.Value, fileName);
         }
 
-        /// <summary>
-        /// Extracts invoice data from a file already uploaded to Blob Storage.
-        /// </summary>
         public async Task<Invoices> ExtractInvoiceDataFromBlobAsync(string fileUrl)
         {
             var operation = await _client.AnalyzeDocumentAsync(
@@ -42,10 +42,10 @@ namespace Infrastructure.Services
                 "prebuilt-invoice",
                 new Uri(fileUrl));
 
-            return MapToInvoice(operation.Value, fileUrl);
+            return await MapToInvoiceAsync(operation.Value, fileUrl);
         }
 
-        private Invoices MapToInvoice(AnalyzeResult result, string fileReference)
+        private async Task<Invoices> MapToInvoiceAsync(AnalyzeResult result, string fileReference)
         {
             var doc = result.Documents.FirstOrDefault();
             if (doc == null)
@@ -53,27 +53,12 @@ namespace Infrastructure.Services
 
             var fields = doc.Fields;
 
-            string vendor = fields.TryGetValue("VendorName", out var vendorField)
-                ? vendorField.Content
-                : "Unknown";
+            string vendor = ExtractVendor(fields);
+            decimal amount = ExtractAmount(fields);
+            DateTime date = ExtractDate(fields);
+            string customerName = ExtractCustomerName(fields);
 
-            decimal amount = 0;
-            if (fields.TryGetValue("InvoiceTotal", out var totalField))
-            {
-                if (totalField.ValueCurrency is not null)
-                    amount = Convert.ToDecimal(totalField.ValueCurrency.Amount);
-                else if (decimal.TryParse(totalField.Content, out var parsed))
-                    amount = parsed;
-            }
-
-            DateTime date = DateTime.UtcNow;
-            if (fields.TryGetValue("InvoiceDate", out var dateField))
-            {
-                if (dateField.ValueDate is not null)
-                    date = dateField.ValueDate.Value.DateTime;
-                else if (DateTime.TryParse(dateField.Content, out var parsed))
-                    date = parsed;
-            }
+            var category = await _categorizationService.CategorizeWithOpenAPIAsync(vendor, customerName);
 
             return new Invoices
             {
@@ -81,23 +66,50 @@ namespace Infrastructure.Services
                 Vendor = vendor,
                 Amount = amount,
                 Date = date,
-                Category = CategorizeVendor(vendor),
-                Description = fields.TryGetValue("CustomerName", out var custField) ? custField.Content : "",
+                Category = category,
+                Description = customerName,
                 FileUrl = fileReference
             };
         }
 
-        private InvoiceCategory CategorizeVendor(string vendor)
+        private string ExtractVendor(IReadOnlyDictionary<string, DocumentField> fields)
         {
-            vendor = vendor.ToLowerInvariant();
+            return fields.TryGetValue("VendorName", out var vendorField)
+                ? vendorField.Content ?? "Unknown"
+                : "Unknown";
+        }
 
-            if (vendor.Contains("airlines") || vendor.Contains("hotel") || vendor.Contains("travel"))
-                return InvoiceCategory.Travel;
+        private decimal ExtractAmount(IReadOnlyDictionary<string, DocumentField> fields)
+        {
+            if (fields.TryGetValue("InvoiceTotal", out var totalField))
+            {
+                if (totalField.ValueCurrency is not null)
+                    return Convert.ToDecimal(totalField.ValueCurrency.Amount);
 
-            if (vendor.Contains("food") || vendor.Contains("restaurant") || vendor.Contains("cafe") || vendor.Contains("pizza"))
-                return InvoiceCategory.Food;
+                if (decimal.TryParse(totalField.Content, out var parsed))
+                    return parsed;
+            }
+            return 0;
+        }
 
-            return InvoiceCategory.Other;
+        private DateTime ExtractDate(IReadOnlyDictionary<string, DocumentField> fields)
+        {
+            if (fields.TryGetValue("InvoiceDate", out var dateField))
+            {
+                if (dateField.ValueDate is not null)
+                    return dateField.ValueDate.Value.DateTime;
+
+                if (DateTime.TryParse(dateField.Content, out var parsed))
+                    return parsed;
+            }
+            return DateTime.UtcNow;
+        }
+
+        private string ExtractCustomerName(IReadOnlyDictionary<string, DocumentField> fields)
+        {
+            return fields.TryGetValue("CustomerName", out var custField)
+                ? custField.Content ?? string.Empty
+                : string.Empty;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities.Invoice;
-namespace Application.Interface
+namespace Application.Interface.Azure
 {
     public interface IOcrInvoiceService
     {

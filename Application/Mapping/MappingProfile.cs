@@ -1,5 +1,7 @@
-﻿using Application.DTOs.Invoices;
+﻿using Application.DTOs;
+using Application.DTOs.Invoices;
 using AutoMapper;
+using Domain.Entities.ApplicationUsers;
 using Domain.Entities.Invoice;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -17,6 +19,13 @@ namespace Application.Mapping
             CreateMap<PostInvoiceDto, Invoices>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
                 .ForMember(dest => dest.FileUrl, opt => opt.Ignore());
+        }
+    }
+    public class UserProfileMapping : Profile
+    {
+        public UserProfileMapping()
+        {
+            CreateMap<ApplicationUser, UserProfileDto>();
         }
     }
 }

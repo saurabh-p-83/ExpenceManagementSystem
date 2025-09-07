@@ -1,6 +1,7 @@
-using Application.Interface;
 using Application.Interface.Auth;
+using Application.Interface.Azure;
 using Application.Interface.Invoice;
+using Application.Interface.NewFolder;
 using Application.Mapping;
 using Application.Services;
 using Application.Validators.Invoices;
@@ -56,13 +57,14 @@ public class Program
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IFileStorageService, FileStorageService>();
         builder.Services.AddScoped<IOcrInvoiceService, OcrInvoiceService>();
+        builder.Services.AddScoped<ICategorizationService, OpenAICategorizationService>();
         #endregion
 
         // Configure Identity and JWT Authentication
         builder.Services.AddIdentityAndJwtAuthentication(builder.Configuration);
         builder.Services.AddApplicationServices();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerConfiguration();
 
 
         var app = builder.Build();

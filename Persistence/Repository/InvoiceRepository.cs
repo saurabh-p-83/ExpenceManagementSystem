@@ -34,16 +34,19 @@ namespace Persistence.Repository
         public async Task AddInvoiceAsync(Invoices invoice)
         {
             await _context.Invoices.AddAsync(invoice);
+            await _context.SaveChangesAsync(); 
         }
 
-        public void UpdateInvoice(Invoices invoice)
+        public async Task UpdateInvoice(Invoices invoice)
         {
             _context.Invoices.Update(invoice);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteInvoice(Invoices invoice)
+        public async Task DeleteInvoice(Invoices invoice)
         {
             _context.Invoices.Remove(invoice);
+            await _context.SaveChangesAsync(); 
         }
     }
 }

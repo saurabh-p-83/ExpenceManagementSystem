@@ -12,8 +12,8 @@ namespace Application.Interface.Invoice
         Task<IEnumerable<Invoices>> GetInvoicesAsync(Guid userId);
         Task<Invoices?> GetByIdAsync(Guid id);
         Task AddInvoiceAsync(Invoices invoice);
-        void UpdateInvoice(Invoices invoice);
-        void DeleteInvoice(Invoices invoice);
+        Task UpdateInvoice(Invoices invoice);
+        Task DeleteInvoice(Invoices invoice);
     }
 }
 

@@ -16,13 +16,7 @@ namespace Application.DTOs.Invoices
 
     public class PostInvoiceDto
     {
-        public string Vendor { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public DateTime Date { get; set; }
-        public InvoiceCategory Category { get; set; }
-        public string? Description { get; set; } = string.Empty;
-        public Guid UserId { get; set; }
-        public IFormFile? BillFile { get; set; }
+        public IFormFile BillFile { get; set; } = default!;
     }
     public class GetInvoiceDtoReq
     {

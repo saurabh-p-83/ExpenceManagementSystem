@@ -1,11 +1,11 @@
 ﻿using Application.DTOs;
 using Application.DTOs.Invoices;
-using Application.Interface;
+using Application.Interface.Azure;
 using Application.Interface.Invoice;
+using Application.Interface.NewFolder;
 using AutoMapper;
 using Domain.Entities.Invoice;
-using Domain.Enums;
-
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services
 {
@@ -13,14 +13,19 @@ namespace Application.Services
     {
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IOcrInvoiceService _ocrInvoiceService;
         private readonly IMapper _mapper;
 
-
-        public InvoiceService(IInvoiceRepository invoiceRepository, IFileStorageService fileStorageService, IMapper mapper)
+        public InvoiceService(
+            IInvoiceRepository invoiceRepository,
+            IFileStorageService fileStorageService,
+            IMapper mapper,
+            IOcrInvoiceService ocrInvoiceService)
         {
             _invoiceRepository = invoiceRepository;
             _fileStorageService = fileStorageService;
             _mapper = mapper;
+            _ocrInvoiceService = ocrInvoiceService;
         }
 
         public async Task<IEnumerable<GetInvoiceDtoRes>> GetInvoiceAsync(GetInvoiceDtoReq input)
@@ -35,36 +40,42 @@ namespace Application.Services
 
             return _mapper.Map<IEnumerable<GetInvoiceDtoRes>>(allInvoices);
         }
-        public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto)
+
+        public async Task<Guid> SaveInvoiceAsync(PostInvoiceDto dto, Guid userId)
         {
-            string? fileUrl = null;
-            if (dto.BillFile != null)
+            ValidateFile(dto?.BillFile);
+
+            // Extract structured invoice data using OCR
+            var invoiceFromOcr = await ExtractInvoiceData(dto.BillFile);
+
+            // Save uploaded file to blob
+            var fileUrl = await _fileStorageService.UploadFileOnBlob(dto.BillFile);
+            invoiceFromOcr.FileUrl = fileUrl;
+            invoiceFromOcr.UserId = userId;
+
+            // Persist the invoice
+            await _invoiceRepository.AddInvoiceAsync(invoiceFromOcr);
+
+            return invoiceFromOcr.Id;
+        }
+
+        private async Task<Invoices> ExtractInvoiceData(IFormFile file)
+        {
+            using var stream = file.OpenReadStream();
+            var invoice = await _ocrInvoiceService.ExtractInvoiceDataAsync(stream, file.FileName);
+
+            if (invoice == null)
             {
-                fileUrl = await _fileStorageService.UploadFileOnBlob(dto.BillFile);
+                throw new InvalidOperationException("OCR failed to extract invoice data from the uploaded file.");
             }
 
-
-            var category = CategorizeInvoice(dto);
-
-            var invoice = _mapper.Map<Invoices>(dto);
-            ;
-            invoice.FileUrl = fileUrl;
-            invoice.Category = category;
-
-            await _invoiceRepository.AddInvoiceAsync(invoice);
-
-            return invoice.Id;
+            return invoice;
         }
-        private InvoiceCategory CategorizeInvoice(PostInvoiceDto dto)
+
+        private void ValidateFile(IFormFile file)
         {
-            //Basic AI logic placeholder — replace with ML later
-            if (dto.Vendor.Contains("Amazon", StringComparison.OrdinalIgnoreCase))
-                return InvoiceCategory.Shopping;
-
-            if (dto.Vendor.Contains("Uber", StringComparison.OrdinalIgnoreCase))
-                return InvoiceCategory.Travel;
-
-            return InvoiceCategory.Other;
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("No file provided", nameof(file));
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿using Application.Interface.Invoice;
-using Application.DTOs.Invoices;
+﻿using Application.DTOs.Invoices;
+using Application.Interface.Invoice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ExpenseManagementSystemAPI.Controllers
 {
@@ -26,7 +27,11 @@ namespace ExpenseManagementSystemAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostInvoice([FromForm] PostInvoiceDto dto)
         {
-            var id = await _invoiceService.SaveInvoiceAsync(dto);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            var id = await _invoiceService.SaveInvoiceAsync(dto, userId);
             return Ok(new { id });
         }
     }
